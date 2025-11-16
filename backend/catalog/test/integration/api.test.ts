@@ -1,46 +1,60 @@
-import axios from "axios";
+import axios from "axios"
+import SqliteAdapter from "../../src/infra/database/SqliteAdapter"
+import { initSqliteSchema } from "../../src/infra/database/sqlite_init"
+import DatabaseRepositoryFactory from "../../src/infra/factory/DatabaseRepositoryFactory"
+import UsecaseFactory from "../../src/infra/factory/UsecaseFactory"
+import ExpressAdapter from "../../src/infra/http/ExpressAdapter"
+import HttpController from "../../src/infra/http/HttpController"
 
-axios.defaults.validateStatus = function () {
-	return true;
-}
+axios.defaults.validateStatus = () => true
 
-test("Deve listar os produtos em json", async function () {
-	const response = await axios({
-		url: "http://localhost:3001/products",
-		headers: {
-			"content-type": "application/json"
-		}
-	});
-	const output = response.data;
-	expect(output).toHaveLength(3);
-	expect(output.at(0)?.idProduct).toBe(1);
-	expect(output.at(1)?.idProduct).toBe(2);
-	expect(output.at(2)?.idProduct).toBe(3);
-});
+let server: ExpressAdapter
+let connection: SqliteAdapter
 
-test("Deve listar os produtos em csv", async function () {
-	const response = await axios({
-		url: "http://localhost:3001/products",
-		headers: {
-			"content-type": "text/csv"
-		}
-	});
-	const output = response.data;
-	expect(output).toBe("1;A;1000\n2;B;5000\n3;C;30");
-});
+beforeAll(async () => {
+    connection = new SqliteAdapter()
+    await connection.connect("./catalog_api_test.sqlite")
+    await initSqliteSchema(connection)
+    const repositoryFactory = new DatabaseRepositoryFactory(connection)
+    const usecaseFactory = new UsecaseFactory(repositoryFactory)
+    server = new ExpressAdapter()
+    new HttpController(server, usecaseFactory)
+    server.listen(3001)
+})
 
-test("Deve retornar um produto", async function () {
-	const response = await axios({
-		url: "http://localhost:3001/products/1"
-	});
-	const output = response.data;
-	expect(output.idProduct).toBe(1);
-	expect(output.description).toBe("A");
-	expect(output.price).toBe(1000);
-	expect(output.width).toBe(100);
-	expect(output.height).toBe(30);
-	expect(output.length).toBe(10);
-	expect(output.weight).toBe(3);
-	expect(output.volume).toBe(0.03);
-	expect(output.density).toBe(100);
-});
+afterAll(async () => {
+    await connection.close()
+})
+
+test("Deve listar os produtos em json (SQLite)", async function () {
+    const response = await axios.get("http://localhost:3001/products", {
+        headers: { "content-type": "application/json" },
+    })
+    const output = response.data
+    expect(output).toHaveLength(100)
+    expect(output[0].idProduct).toBe(1)
+    expect(output[0].price).toBe(10)
+})
+
+test("Deve listar os produtos em csv (SQLite)", async function () {
+    const response = await axios.get("http://localhost:3001/products", {
+        headers: { "content-type": "text/csv" },
+    })
+    const output: string = response.data
+    const firstLine = output.split("\n")[0]
+    expect(firstLine).toBe("1;Product 1;10")
+})
+
+test("Deve retornar um produto (SQLite)", async function () {
+    const response = await axios.get("http://localhost:3001/products/1")
+    const output = response.data
+    expect(output.idProduct).toBe(1)
+    expect(output.description).toBe("Product 1")
+    expect(output.price).toBe(10)
+    expect(output.width).toBe(11)
+    expect(output.height).toBe(6)
+    expect(output.length).toBe(9)
+    expect(output.weight).toBe(2)
+    expect(output.volume).toBeCloseTo(0.000594, 10)
+    expect(output.density).toBeCloseTo(2 / 0.000594, 2)
+})
