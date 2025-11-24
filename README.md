@@ -21,26 +21,122 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 
 #### 1. **Linguagem de Programação**
 - Qual linguagem de programação o backend utiliza?
+
+     **Resposta:** TypeScript/Node.js, 
+      EVIDENCIA É QUE TEMOS ARQUIVOS .ts EN TODAS AS PASTAS,package.json, POIS USAMOS npm iNSTALL
+      E main_api.ts, COMO PONTO DE ENTRADA 
+
 - Quais são as vantagens dessa linguagem para este tipo de aplicação?
+
+      **Resposta**
+
+      TypeScript sobre Node.js oferece uma combinação boa para o desenvolvimento de aplicações modernas. O JavaScript se estabeleceu como uma linguagem universal que permite uma abordagem full-stack, onde nós os desenvolvedores podemos trabalhar tanto no frontend quanto no backend utilizando o mesmo ambiente, promovendo uma maior coesão técnica nos projetos. 
+
+      O TypeScript eleva a qualidade do código através de seu sistema de tipos, que atua como uma camada de segurança. Esta característica permite detectar erros ainda durante a fase de compilação, muito antes do código chegar à produção. O type safety não apenas previne bugs comuns, mas também serve como documentação viva do sistema, onde as interfaces e tipos definidos comunicam claramente as intenções do código e as expectativas de cada módulo. Esta clareza da estrutura é muito valiosa em projetos que seguem arquiteturas complexas, como a Clean Architecture que foi a  implementada neste projeto.
+
+   O ecossistema Node.js oferece uma das mais amplas coleções de bibliotecas e ferramentas do mercado de desenvolvimento. Através do NPM, nós os desenvolvedores temos acesso a soluções maduras e bem testadas para qualquer necessidade, desde frameworks web como Express e Fastify até utilitários de validação, ORMs e ferramentas de build. Esta ampla gama de recursos acelera significativamente o desenvolvimento e reduz a necessidade de reinventar soluções já consolidadas na comunidade de desenvolvedores.
+
 
 #### 2. **Configuração e Execução**
 - Como clonar o repositório do backend?
+
+      **Resposta**
+      - clonar: no terminal digite:git clone https://github.com/leonardorsolar/microservice-product.git, será clonado o projeto todo, tanto backend como frontend
+
+      - abrir a pásta do projeto: cd microservice-product
+
 - Quais são os passos necessários para instalar as dependências?
+
+      **Resposta**
+
+         - Ir até o microserviço: cd backend/catalog
+         - Instalar as dependencias: npm install
+         Esse npm install lê o package.json onde estão listados os pacotes a serem instalados, cria a pasta com todas as bibliotecas e instala as depencias necessárias
+
+         - Como cada microserviço tem seu package.json é necessário instalar as dependencias de cada.
+
 - Como executar a aplicação em ambiente de desenvolvimento?
+
+      **Resposta** 
+
+      Podemos ter varias opções mas uma fácil e que eu usei foi:
+
+      -rodar npm run start:sqlite, que cria o arquivo catalog.sqlite e popula ele com os dados de exemplo e roda na porta 3001. 
+
+
+      
 - Existe um arquivo de variáveis de ambiente? Quais configurações são necessárias?
+
+      **Resposta**
+      Não existe um arquivo de ambiente. Não fiz nehuma configuração só rodei na pasta bankend  npm run start:sqlite
+      e ele cria o banco de dados, popula com os dados de exemplo e fica disponível na porta selecionada. 
+
+
 
 #### 3. **Arquitetura de Software**
 - Qual padrão arquitetural foi implementado? (Dica: observe a estrutura de pastas)
+
+   **Resposta**
+      O projeto tem uma arquitetura de microsserviços combinada com Clean Architecture. Nessa abordagem há na organização do código, onde cada funcionalidade de negócio, catalog, auth, checkout, freight e stock, é implementada como um serviço independente e auto-contido. Cada microsserviço segue individualmente Clean Architecture e mantem uma estrutura interna organizada em camadas de domain, application e infra. 
+
+      Esta dupla estratificação permite que cada serviço consiga evoluir de forma independente.
+
 - Explique o papel de cada camada: `domain`, `application`, `infra`
+
+      **Resposta**
+
+         A camada domain representa o coração de cada microsserviço, contendo as regras de negócio. No serviço de catalog, por exemplo, esta camada define o que é um produto, suas propriedades essenciais e as validações que garantem sua integridade. 
+         A camada application orquestra os casos de uso específicos de cada serviço, implementando a lógica de aplicação que coordena as operações sem se preocupar com detalhes técnicos. 
+         A camada infra fornece as implementações concretas para conexão com bancos de dados, APIs externas e outras ferramentas, servindo como ponte entre a lógica de negócio e o mundo exterior. 
+
 - Por que essa separação é importante para a qualidade do código?
+
+      **Resposta**
+
+      Esta separação em camadas é fundamental para a qualidade do código porque estabelece limites claros de responsabilidade. Ao isolar as regras de negócio puras na camada domain, garantimos que mudanças na infraestrutura, como trocar de banco de dados ou framework web, não impactem o núcleo do negócio. A arquitetura permite que times diferentes trabalhem em camadas distintas sem conflitos, facilita a escrita de testes automatizados focados e possibilita a evolução técnica independente de cada componente. Em um contexto de microsserviços, essa organização é ainda mais útil, pois cada serviço pode ser desenvolvido, testado e implantado de forma autônoma.
+
 - Quais são os endpoints da API disponíveis?
+
+   **Resposta**
+      Cada microsserviço expõe endpoints específicos para sua área de responsabilidade. No serviço de catalog  estão disponíveis os endpoints GET /products para listagem de produtos e GET /products/:idProduct para busca individual. O auth oferece endpoints para autenticação, o checkout para processamento de pedidos, o freight para cálculo de fretes e o stock para gestão de estoque. Esta divisão por domínio funcional permite que cada API seja especializada e otimizada para seu propósito específico.
+
 - Como a aplicação implementa a inversão de dependências?
+
+   **Resposta**
+      A aplicação implementa a inversão de dependências através de um sistema de contratos entre as camadas. As interfaces são declaradas nas camadas mais internas, domain e application,  enquanto as implementações concretas são fornecidas pelas camadas externas de infraestrutura. Por exemplo, o caso de uso GetProducts declara sua dependência em uma interface ProductRepository, sem saber se a implementação real usará SQLite, PostgreSQL ou outo banco. Esta abstração permite que diferentes tecnologias sejam "plugadas" sem modificar a lógica de negócio.
 
 #### 4. **Banco de Dados**
 - Qual banco de dados a aplicação utiliza por padrão?
+
+   **Resposta**
+
+      A aplicação suportando tanto PostgreSQL quanto SQLite de forma nativa. Analisando a implementação, não há um banco "padrão" definido, mas sim uma flexibilidade que permite escolher entre as duas tecnologias conforme o ambiente. Lembrabdo que SQLite é otimizado para desenvolvimento e testes pois cria um banco local automaticamente, enquanto o PostgreSQL é orientado para ambientes de produção, pois exige configuração prévia mas oferecendo maior robustez e desempenho.
+
 - Descreva a estrutura das tabelas do banco de dados
+
+      **Resposta**
+
+      id_product    INTEGER PRIMARY KEY,
+      description   TEXT NOT NULL,
+      price         NUMERIC/REAL NOT NULL,
+      width         INTEGER,
+      height        INTEGER, 
+      length        INTEGER,
+      weight        NUMERIC/REAL
+
 - Como o código desacopla a lógica de negócio da tecnologia de banco de dados?
+
+   **Resposta**
+
+      O desacoplamento é implementado através de uma arquitetura em camadas com inversão de dependências. A camada de application define a interface ProductRepository com os métodos list() e get(id), estabelecendo um contrato que qualquer implementação de persistência deve seguir. As implementações concretas "ProductRepositoryDatabase" para PostgreSQL e "ProductRepositorySqlite" para SQLite, residem na camada de infraestrutura e são responsáveis por traduzir essas operações genéricas em comandos específicos de cada banco.
+
+      O sistema utiliza Adapter através da interface DatabaseConnection, que abstrai as diferenças entre os drivers dos bancos. Isso permite que a lógica de negócio na camada domain e application permaneça completamente independente da tecnologia de persistência.
+
+
 - Existe algum mecanismo de migração de dados?
+      **Resposta**
+
+      Não encontrei mecanismo de migração de dados, existe uma abordagem para SQLite, onde pode criar a tabela e popular ela; e outra para PostgreSQL, onde a tabela é criada antes de rodar a aplicação de forma manual. 
 
 #### 5. **Funcionalidades**
 - Liste todas as funcionalidades disponíveis na aplicação
