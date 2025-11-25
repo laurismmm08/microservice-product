@@ -140,13 +140,108 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 
 #### 5. **Funcionalidades**
 - Liste todas as funcionalidades disponíveis na aplicação
+
+   **Resposta**
+
+      1. Catalog Service
+         1.1 Listagem de Produtos
+
+         1.2 Busca de Produto Específico
+
+      2. Auth Service
+         2.1 Registro de Usuários
+
+         2.2 Autenticação de Login
+
+         2.3 Validação de Tokens
+
+      3. Checkout Service
+         3.1 Finalização de Compra
+
+         3.2 Consulta de Pedidos
+
+         3.3 Listagem de Pedidos
+
+         3.4 Validação de Cupons
+
+      4. Freight Service
+    
+         4.1 Simulação de Frete
+
+      5. Stock Service - Controle de Estoque
+         5.1 Consulta de Estoque
+
+         5.2 Redução de Estoque
+
+         5.3 Limpeza de Estoque
+
 - Quais operações CRUD estão implementadas?
+
+   **Resposta**
+
+      Operações CREATE
+         Criação de Usuários
+
+         Criação de Pedidos
+
+         Registro de Produtos
+
+      Operações READ
+         Consulta de Produtos
+
+         Consulta de Pedidos
+
+         Consulta de Estoque
+
+         Validação de Autenticação
+
+         Consulta de Frete
+
+      Operações UPDATE
+         Atualização de Estoque
+
+         Atualização de Status de Cupons
+
+         Atualização de Dimensões
+
+      Operações DELETE
+         Limpeza de Estoque
 
 #### 6. **Testes Automatizados**
 - A aplicação possui testes? De quais tipos? (unitários, integração, e2e)
+
+   **Resposta**
+
+      Todos os cinco microsserviços possuem uma serie de testes organizada em duas categorias:
+
+      Testes de Integração: Estão na pasta integration/, estes testes verificam o funcionamento conjunto de componentes, incluindo endpoints HTTP, comunicação com banco de dados PostgreSQL, e integração entre diferentes camadas da aplicação. Estes testes dependem de infraestrutura externa (banco de dados) e falham quando o PostgreSQL não está disponível.
+
+      Testes Unitários: Localizados na pasta unit/, focam em componentes como entidades de domínio (Product, Order, Coupon), value objects (Cpf, Password), utilitários (StockCalculator, FreightCalculator) e regras de negócio puras. Estes testes são independentes de infraestrutura.
+
 - Como executar a suite de testes?
+
+   **Resposta**
+
+      
+      npm test
+
+
+      npx jest
+
+
+      npm run test:watch  # ou npx jest --watch (modo desenvolvimento)
+
 - Como gerar o relatório de cobertura de código (coverage)?
+   **Resposta**
+      
+      npm test -- --coverage OU npx jest --coverage
+
+
 - Qual a porcentagem de cobertura? Isso é suficiente?
+
+   **Resposta**
+
+      A aplicação apresenta uma cobertura de testes variável entre os microsserviços, com o Catalog de 83.44% de statements e 86.56% de linhas, enquanto o Auth possui apenas 66.66% de statements e uma cobertura de branches de 9.09%. Os demais serviços, Checkout, Freight e Stock,mantêm coberturas regulares entre 65% e 70%. Indica falta de padronização na estratégia de testes. Apesar da estrutura de testes estar bem organizada em unitários e de integração, a implementação atual necessita de melhorias significativas antes de ser considerada adequada para ambiente produtivo.
 
 #### 7. **Qualidade de Código - Linting**
 - O que é linting e qual sua importância para a qualidade do código?
