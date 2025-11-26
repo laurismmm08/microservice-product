@@ -245,21 +245,94 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 
 #### 7. **Qualidade de Código - Linting**
 - O que é linting e qual sua importância para a qualidade do código?
+
+      **Resposta**
+
+         Linting é o processo de análise estática do código que identifica automaticamente problemas de estilo, padrões inconsistentes e possíveis erros antes da execução. É fundamental para manter a consistência em bases de código colaborativas, prevenir bugs através da detecção precoce de problemas, facilitar a manutenção através de convenções padronizadas e garantir a aplicação de boas práticas de desenvolvimento.
+
 - Qual ferramenta de lint está configurada no projeto?
+
+      **Resposta**
+
+         Não achei ferramentas de linting configurada no projeto. Os arquivos de configuração de ESLint e Prettier encontrados pertencem exclusivamente a dependências do node_modules.
+
 - Como executar a verificação de lint?
+
+      **Resposta**
+
+         npx tsc --noEmit
+         npm run build
+
 - Quais regras de estilo estão sendo aplicadas?
+
+      **Resposta**
+
+      As regras estão sendo definidas no tsconfig.json de cada microsserviço
+
+      "strict"
+
+      "forceConsistentCasingInFileNames"
+
+      "esModuleInterop"
+
+      "skipLibCheck"
+
+      Target ES2016
+
+      Module CommonJS
 
 #### 8. **Pergunta Avançada**
 - Para rodar a aplicação com PostgreSQL em vez de SQLite, quais mudanças seriam necessárias?
+
+      **Resposta**
+
+         A aplicação já está configurada para suportar ambos os bancos de dados através de um sistema flexível 
+
+         Comando atual para SQLite:
+
+         npm run start:sqlite ou 
+         DB=sqlite DB_FILE=./catalog.sqlite npm start
+
+         Comando para PostgreSQL:
+
+
+         npm start OU npm run dev OU DB=postgres npm start
+         Precisa garantir que esteja rodando 
+
+         Host: localhost
+         Porta: 5432
+         Database: app
+         Usuário: postgres
+         Senha: 123456
+         Schema: cccat11 com tabela product criada
+
+         A infraestrutura já está preparada com:
+
+         Dois adapters de banco, PgPromiseAdapter e SqliteAdapter
+
+         Dois repositórios, ProductRepositoryDatabase e ProductRepositorySqlite
+
+         Factory pattern
 - Isso demonstra qual princípio de qualidade de software?
 
+      **resposta**
+
+      Esta implementação demonstra o Princípio da Inversão de Dependência (DIP), "D" do SOLID.
+      Esta é uma implementação de Ports and Adapters (Hexagonal Architecture), onde o núcleo da aplicação permanece completamente agnóstico aos detalhes tecnológicos externos.
 ---
 
 ### **Frontend - Análise Inicial**
 
 #### 1. **Linguagem e Framework**
 - Qual linguagem/framework o frontend utiliza?
+      **Resposta**
+
+         O frontend foi desenvolvido utilizando React com JavaScript como tecnologia principal, complementado com ferramentas que inclui Vite como bundler, Tailwind CSS para estilização e React Router DOM para gerenciamento de rotas. Esta escolha é das mais adotadas pela comunidade atualmente.
+
 - Por que essa escolha é adequada para aplicações modernas?
+      **Resposta**
+
+      O React oferece uma arquitetura baseada em componentes que promove reutilização de código, facilitando a manutenção e escalabilidade da aplicação. A integração com Vite proporciona um ambiente de desenvolvimento extremamente eficiente, com recarregamento rápido de módulos durante o desenvolvimento e builds otimizados para produção mais rápido. O Tailwind CSS introduz uma metodologia de estilização utilitária que acelera o desenvolvimento visual, e o React Router DOM oferece uma solução robusta para gerenciamento de navegação. A inclusão de Vitest e Testing Library assegura que a aplicação possa ser adequadamente testada. 
 
 #### 2. **Configuração e Execução**
 - Como clonar o repositório do frontend?
