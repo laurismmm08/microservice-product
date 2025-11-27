@@ -336,14 +336,56 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 
 #### 2. **Configuração e Execução**
 - Como clonar o repositório do frontend?
+
+      **Resposta**
+
+         git clone https://github.com/leonardorsolar/microservice-product.git
+         Após a clonagem, é essencial navegar até o diretório específico do frontend usando cd microservice-product/frontend
+
 - Como instalar as dependências?
+      **Resposta**
+
+      A instalação das dependências é realizada através do comando npm install executado dentro do diretório do frontend. 
+      Este processo analisa o arquivo package.json que define todas as bibliotecas necessárias, incluindo React para a interface de usuário, React Router DOM para gerenciamento de rotas, Tailwind CSS para estilização, Vite como ferramenta de build, e diversas dependências de desenvolvimento para testing e linting. 
+      Durante a instalação, o npm resolve automaticamente todas as dependências transitivas, criando a pasta node_modules com todo o ecossistema de bibliotecas necessário para o funcionamento da aplicação.
+
 - Como executar a aplicação em modo de desenvolvimento?
+
+      **Resposta**
+
+      o comando npm run dev, que utiliza o Vite para fornecer um ambiente de desenvolvimento otimizado. 
+      O servidor normalmente fica disponível na porta 5173, acessível através do endereço http://localhost:5173, proporcionando aos desenvolvedores um feedback imediato durante o ciclo de desenvolvimento.
+
 - Como fazer o build para produção?
+
+      **Resposta**
+
+      Utiliza-se o comando npm run build, que aciona o processo de build do Vite. O resultado é uma pasta dist contendo todos os arquivos prontos para deploy em qualquer servidor web estático ou serviço de hospedagem, com a aplicação completamente preparada para ambiente produtivo.
 
 #### 3. **Arquitetura e Estrutura**
 - Qual padrão de organização de código foi utilizado?
+
+      **Resposta**
+
+         O frontend adota um padrão híbrido de arquitetura que combina Feature-Based Modules com Component-Based Design. Esta abordagem organiza o código tanto por funcionalidades de negócio (módulos) quanto por reutilização técnica (componentes). A aplicação utiliza React Router DOM para gerenciar a navegação entre os diferentes módulos, com cada rota mapeando para um módulo específico que encapsula toda a lógica relacionada a uma área funcional particular.
+
 - Explique a estrutura de pastas: `components`, `modules`, `lib`
+
+      **Resposta** 
+
+      A pasta components contém elementos de interface de usuário reutilizáveis, com uma subpasta ui dedicada a componentes primitivos como botões, inputs e outros elementos básicos que formam a fundação visual da aplicação. Estes componentes são agnósticos de negócio e focam exclusivamente em apresentação e interação.
+
+      A pasta modules implementa a organização por funcionalidades de negócio, contendo módulos especializados como produto para gestão de catálogo e usuario para administração de usuários. Cada módulo é uma unidade autocontida que inclui componentes específicos, lógica de estado, e integrações com APIs, é uma feature completa da aplicação.
+
+      A pasta lib serve como uma camada de utilitários compartilhados, contendo funções helper e lógica comum que é utilizada across múltiplos módulos e componentes. 
+
 - Por que separar código em módulos é uma boa prática?
+
+      **Resposta**
+
+         A separação do código em módulos constitui uma boa prática para a qualidade do software  devido a múltiplos benefícios inter-relacionados. Ela promove alta coesão e baixo acoplamento, agrupando código relacionado enquanto minimiza dependências entre diferentes partes do sistema. 
+
+         Em contextos de desenvolvimento em equipe, a modularização permite trabalho paralelo eficiente, onde diferentes desenvolvedores podem focar em módulos distintos sem constantes conflitos de merge ou bloqueios. Cada módulo pode evoluir independentemente, seguindo seu próprio ritmo de desenvolvimento e prioridades. Adicionalmente, esta abordagem facilita o testing e a qualidade, pois cada módulo pode ser testado de forma isolada, com mocks e stubs bem definidos para suas dependências externas.
 
 #### 4. **Design UI/UX**
 - Qual estratégia de design foi utilizada? (CSS puro, framework, biblioteca de componentes)
