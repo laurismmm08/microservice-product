@@ -15,11 +15,27 @@ export default class ExpressAdapter implements HttpServer {
     on(method: string, url: string, callback: Function): void {
         this.app[method](url, async function (req: Request, res: Response) {
             try {
-                const output = await callback(req.params, req.body, req.headers)
-                res.json(output)
+                // Combina params da rota com query parameters
+                const allParams = { ...req.params, ...req.query };
+                const output = await callback(allParams, req.body, req.headers)
+                
+                // Detecta se é CSV (string com vírgulas e quebras de linha)
+                const isLikelyCsv = typeof output === 'string' && 
+                    (output.includes(',') || output.includes('\n'));
+                
+                if (isLikelyCsv) {
+                    res.setHeader("Content-Type", "text/csv");
+                    res.send(output);
+                } else {
+                    res.json(output);
+                }
             } catch (e: any) {
-                res.status(422).json({
-                    message: e.message,
+                // Se o erro tiver status code específico, usa ele
+                const statusCode = e.status || 422;
+                const message = e.message || e;
+                
+                res.status(statusCode).json({
+                    error: message,
                 })
             }
         })

@@ -389,29 +389,110 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 
 #### 4. **Design UI/UX**
 - Qual estratégia de design foi utilizada? (CSS puro, framework, biblioteca de componentes)
+
+      **Resposta**
+
+         O projeto usa Tailwind CSS combinada com bibliotecas de utilitários. O uso de tailwind-merge dá uma composição inteligente de classes e clsx para gerenciamento condicional de estilos. 
+
 - A aplicação é responsiva? Como foi implementado?
+
+      **Resposta**
+         Sim, a aplicação é totalmente responsiva e foi implementada através das capacidades nativas do Tailwind CSS combinadas com estratégias de design mobile-first. A responsividade é alcançada principalmente através do sistema de breakpoints do Tailwind, que utiliza prefixos como sm:, md:, lg:, e xl: para aplicar estilos condicionais baseados no tamanho da viewport. 
+
+         O código tem implementações como max-w-7xl mx-auto px-4 para containers responsivos e sticky top-0 para headers que se adaptam a diferentes dispositivos. O uso de unidades relativas, flexbox, e grid CSS através das classes utilitárias do Tailwind garante que a interface se reorganize adequadamente desde dispositivos móveis até desktops, mantendo usabilidade e estética em todos os tamanhos de tela.
+
+
 - Identifique componentes reutilizáveis no projeto
+
+      **Resposta**
+
+         No nível mais básico, o Button em src/components/ui/button.jsx serve como componente primitivo reutilizável que encapsula estilos consistentes e comportamentos interativos para ações em toda a aplicação. A função cn em src/lib/utils.js constitui um utilitário de styling reutilizável que combina inteligentemente classes CSS usando clsx e tailwind-merge, sendo utilizada em múltiplos componentes para garantir consistência visual.
+
+         Os módulos de feature como ProdutoModule e UsuarioModule representam componentes reutilizáveis em um nível mais alto de abstração, encapsulando lógicas de negócio específicas que podem ser integradas em diferentes contextos da aplicação. O sistema de navegação implementado no App.jsx com NavLink componentes demonstra padrões reutilizáveis para rotas ativas com estilização condicional. Além disso, os padrões de layout como containers responsivos com max-w-7xl mx-auto px-4 e cards com bg-card text-card-foreground rounded-lg border shadow-sm são elementos de design reutilizáveis que mantêm a consistência visual across da aplicação.
 
 #### 5. **Integração com Backend**
 - Como o frontend se comunica com o backend?
+
+      **Resposta**
+         O frontend estabelece comunicação com o backend através da Fetch API nativa do JavaScript, utilizando requisições HTTP diretas. O ProdutoModule utiliza requisições GET assíncronas com suporte a AbortController para cancelamento, enquanto o UsuarioModule emprega requisições POST para envio de dados. 
+
 - Onde estão configuradas as URLs da API?
+
+   **Resposta**
+
+      As URLs da API estão configuradas de forma hardcoded diretamente nos respectivos módulos que realizam as chamadas, sem centralização em arquivos de configuração ou variáveis de ambiente. Esta abordagem é observada em dois endpoints principais: http://localhost:3001/products para o microsserviço de catalog que gerencia produtos, e http://localhost:3002/criar-usuario para o microsserviço de auth responsável pelo registro de usuários. 
+
 - Como os erros de API são tratados?
+
+      **Resposta**
+      O tratamento de erros é implementado através de estratégias diferenciadas em cada módulo. No ProdutoModule, os erros são gerenciados com um bloco try-catch que verifica tanto a resposta HTTP (através de res.ok) quanto exceções de rede, apresentando mensagens ao usuário como "Não foi possível carregar os produtos" enquanto registra detalhes técnicos no console. Adicionalmente, este módulo implementa proteção contra race conditions através do padrão isMounted e trata especificamente AbortError para evitar atualizações de estado após cancelamento de requisições.
+
+      No UsuarioModule, o tratamento segue um padrão baseado em promises com encadeamento .then().catch(), onde erros de resposta são extraídos do corpo JSON quando disponíveis (errorData.error) ou substituídos por mensagens padrão. Ambos os módulos apresentam feedback visual para os usuários finais através de estados de erro reativos, com o módulo de produtos utilizando estilização condicional (text-red-600) para destacar mensagens de erro, enquanto mantém logs de desenvolvimento para troubleshooting. 
 
 #### 6. **Funcionalidades**
 - Quais funcionalidades estão disponíveis na interface?
+
+      **Resposta**
+
+         A interface oferece duas funcionalidades principais organizadas em módulos independentes acessíveis através de um sistema de navegação por rotas. A funcionalidade de Gestão de Produtos permite aos usuários visualizar um catálogo completo de itens, apresentando informações como identificador único, descrição detalhada e preço formatado em moeda local. A segunda funcionalidade consiste em um Sistema de Registro de Usuários que fornece um formulário interativo para criação de novas contas. Este módulo captura informações como nome completo, endereço de e-mail e senha, implementando validações básicas de formulário e submissão assíncrona aos serviços backend. Após o envio bem-sucedido ou falha no processo, o sistema apresenta feedback contextual apropriado ao usuário, mantendo-o informado sobre o status de suas operações enquanto preserva os dados já inseridos em caso de erros transitórios.
+
 - Como a aplicação gerencia o estado dos dados?
+
+   **Resposta**
+
+      O gerenciamento de estado segue uma abordagem localizada por componente utilizando React Hooks, especificamente o useState para estado interno e useEffect para side effects relacionados a dados assíncronos. No módulo de produtos, o estado é estruturado em três variáveis principais: products para armazenar a lista obtida da API, loading para controlar a exibição de indicadores de carregamento, e error para gerenciar mensagens de falha. Para o módulo de usuários, o estado é organizado em formData que gerencia os campos do formulário através de um objeto unificado, e responseMessage que controla o feedback pós-submissão. A aplicação emprega lifting state up apenas quando necessário, mantendo o estado o mais localizado possível para reduzir complexidade e melhorar a performance através de rerenderizações mínimas. 
 
 #### 7. **Testes**
 - Existem testes no frontend?
+
+      **Resposta**
+         Sim, o frontend possui uma testes implementados que inclui 2 arquivos de teste. O sistema utiliza Vitest como test runner, Testing Library para testes de componentes React, e está configurado para gerar relatórios de cobertura através do pacote @vitest/coverage-v8.
+
 - Que tipos de testes estão implementados?
+
+      **Resposta**
+         Existem testes de snapshot e renderização no App.test.jsx que verifica a presença de elementos específicos como "Microservice Product" no DOM, e testes de integração com APIs mockadas no ProdutoModule.test.jsx que simula respostas da Fetch API para validar o comportamento do componente com dados de produtos. Ambos os testes utilizam JSDOM para ambiente de navegador simulado e seguem práticas de Testing Library focadas em comportamento do usuário.
+
+
 - Como executar os testes?
+
+      **Resposta**
+         npm test
+         npm run test:ci    
+         npm run test:watch 
+         npm run test:ui   
+
 - Como verificar a cobertura de código?
+
+      **Resposta**
+         Comando: npm run test:ci
+
+         Cobertura Geral: 64.28% Statements | 40% Branch | 55.55% Functions | 66% Lines
+
+         Cobertura por Módulo:
+            App.jsx: 100% Statements, 75% Branch, 100% Functions, 100% Lines
+            button.jsx: 100% em todas as métricas
+            utils.js: 100% em todas as métricas
+            ProdutoModule.jsx: 74.19% Statements, 40% Branch, 80% Functions, 76.92% Lines
+            UsuarioModule.jsx: 29.41% Statements, 16.66% Branch, 12.5% Functions, 31.25% Lines
+
+
 
 #### 8. **Qualidade de Código**
 - Existe configuração de lint/prettier?
+      **Resposta**
+         Sim, há configuração de ESLint mas não de Prettier. O projeto usa ESLint 9+ com configuração flat no arquivo eslint.config.js. Inclui plugins para React, React Hooks e React Refresh.
+
+
 - Como executar a verificação de qualidade?
+
+      **Resposta**
+         npm run lint para executar o ESLint em todo o código. O comando verifica arquivos JS/JSX seguindo as regras configuradas. 
+
 - Quais padrões de código estão sendo seguidos?
 
+      **Resposta**
+         Seguem regras modernas de React e JavaScript via ESLint. Inclui boas práticas de hooks, validação de props JSX e componentes compatíveis com hot reload. O código também mostra padrões consistentes com Tailwind CSS, estrutura modular e organização de imports.
 ---
 
 ## 🚀 Parte 2: Implementação de Melhoria
@@ -447,6 +528,26 @@ Você irá analisar uma aplicação full-stack (frontend + backend) disponível 
 - [ ] Testes passando (incluindo novos testes)
 - [ ] README atualizado com a nova funcionalidade
 - [ ] Pull Request com descrição detalhada das mudanças
+
+
+
+      **Resposta**
+
+
+
+      ## 🎯 Status dos Requisitos
+
+      ### ✅ **Backend - Implementado**
+      - [x] Endpoint GET com parâmetros `page` e `limit`
+      - [x] Retorno de metadados de paginação
+      - [x] Paginação na camada de repositório
+      - [x] Testes para o novo comportamento
+
+      ### ✅ **Frontend - Implementado**
+      - [x] Componentes de paginação reutilizáveis
+      - [x] Controles de navegação completa
+      - [x] Exibição de informações da paginação
+      - [x] Experiência do usuário fluida
 
 ---
 

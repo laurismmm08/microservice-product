@@ -1,0 +1,17 @@
+.produto-module {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .produto-module {
+    padding: 1rem;
+  }
+  
+  .produto-module table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

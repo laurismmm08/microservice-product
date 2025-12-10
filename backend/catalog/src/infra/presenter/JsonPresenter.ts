@@ -1,9 +1,7 @@
 import Presenter from "./Presenter";
 
 export default class JsonPresenter implements Presenter {
-	
-	present(data: any) {
-		return data;
-	}
-
+    present(data: any): any {
+        return data;
+    }
 }

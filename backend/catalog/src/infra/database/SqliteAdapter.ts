@@ -1,68 +1,54 @@
-import DatabaseConnection from "./DatabaseConnection"
-import sqlite3 from "sqlite3"
+import sqlite3 from "sqlite3";
+import DatabaseConnection from "./DatabaseConnection";
 
-// Framework and Driver
-// Adapter
 export default class SqliteAdapter implements DatabaseConnection {
-    private db?: sqlite3.Database
+    private connection: sqlite3.Database | null = null;
 
-    async connect(databaseFile: string = ":memory:"): Promise<void> {
-        sqlite3.verbose()
-        await new Promise<void>((resolve, reject) => {
-            const db = new sqlite3.Database(
-                databaseFile,
-                (err: Error | null) => {
-                    if (err) return reject(err)
-                    return resolve()
+    async connect(filename?: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.connection = new sqlite3.Database(
+                filename || "./catalog.sqlite",
+                (err) => {
+                    if (err) {
+                        console.error("SQLite connection error:", err.message);
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
                 }
-            )
-            this.db = db
-        })
+            );
+        });
     }
 
-    async query(statement: string, params: any): Promise<any> {
-        if (!this.db) throw new Error("Database not connected")
-        const sql = statement.trim().toLowerCase()
-        const bind = Array.isArray(params) ? params : []
-
-        if (sql.startsWith("select")) {
-            return await new Promise<any[]>((resolve, reject) => {
-                this.db!.all(
-                    statement,
-                    bind,
-                    (err: Error | null, rows: any[]) => {
-                        if (err) return reject(err)
-                        resolve(rows || [])
-                    }
-                )
-            })
+    async query(statement: string, params: any[]): Promise<any> {
+        if (!this.connection) {
+            throw new Error("Connection not established");
         }
-
-        // For non-SELECT statements, run and return basic metadata
-        return await new Promise<{ lastID: number; changes: number }>(
-            (resolve, reject) => {
-                this.db!.run(
-                    statement,
-                    bind,
-                    function (this: sqlite3.RunResult, err: Error | null) {
-                        if (err) return reject(err)
-                        resolve({
-                            lastID: this.lastID ?? 0,
-                            changes: this.changes ?? 0,
-                        })
-                    }
-                )
-            }
-        )
+        return new Promise((resolve, reject) => {
+            this.connection!.all(statement, params, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
     }
 
     async close(): Promise<void> {
-        if (!this.db) return
-        await new Promise<void>((resolve, reject) => {
-            this.db!.close((err: Error | null) =>
-                err ? reject(err) : resolve()
-            )
-        })
-        this.db = undefined
+        return new Promise((resolve, reject) => {
+            if (!this.connection) {
+                resolve();
+                return;
+            }
+            this.connection.close((err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    this.connection = null;
+                    resolve();
+                }
+            });
+        });
     }
 }

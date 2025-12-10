@@ -1,57 +1,95 @@
-import { OpenAPIV3 } from "openapi-types"
+import { OpenAPIV3 } from "openapi-types";
 
 export const openApiSpec: OpenAPIV3.Document = {
-    openapi: "3.0.3",
+    openapi: "3.0.0",
     info: {
-        title: "Catalog API",
+        title: "Product Catalog API",
         version: "1.0.0",
-        description: "API para consulta de produtos (Postgres ou SQLite)",
+        description: "API for product catalog with pagination support",
     },
-    servers: [{ url: "http://localhost:3001", description: "Local" }],
+    servers: [{ url: "http://localhost:3001", description: "Development server" }],
     paths: {
         "/products": {
             get: {
-                summary: "Lista produtos",
-                tags: ["Products"],
+                summary: "Get products",
+                description: "Retrieve products with optional pagination",
                 parameters: [
+                    {
+                        name: "page",
+                        in: "query",
+                        description: "Page number (default: 1)",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, default: 1 },
+                    },
+                    {
+                        name: "limit",
+                        in: "query",
+                        description: "Items per page (default: 10, max: 100)",
+                        required: false,
+                        schema: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+                    },
                     {
                         name: "Content-Type",
                         in: "header",
+                        description: "Response format",
                         required: false,
-                        schema: {
-                            type: "string",
+                        schema: { 
+                            type: "string", 
                             enum: ["application/json", "text/csv"],
+                            default: "application/json"
                         },
-                        description: "Define formato de saída (padrão JSON).",
                     },
                 ],
                 responses: {
-                    200: {
-                        description: "Lista de produtos",
+                    "200": {
+                        description: "Successful response",
                         content: {
                             "application/json": {
                                 schema: {
-                                    type: "array",
-                                    items: {
-                                        $ref: "#/components/schemas/Product",
+                                    type: "object",
+                                    properties: {
+                                        data: {
+                                            type: "array",
+                                            items: {
+                                                type: "object",
+                                                properties: {
+                                                    idProduct: { type: "integer" },
+                                                    description: { type: "string" },
+                                                    price: { type: "number" },
+                                                },
+                                            },
+                                        },
+                                        pagination: {
+                                            type: "object",
+                                            properties: {
+                                                page: { type: "integer" },
+                                                limit: { type: "integer" },
+                                                total: { type: "integer" },
+                                                totalPages: { type: "integer" },
+                                                hasNextPage: { type: "boolean" },
+                                                hasPreviousPage: { type: "boolean" },
+                                            },
+                                        },
                                     },
                                 },
                             },
                             "text/csv": {
-                                schema: {
-                                    type: "string",
-                                    description: "CSV com produtos",
-                                },
+                                schema: { type: "string" },
                             },
                         },
+                    },
+                    "400": {
+                        description: "Invalid parameters",
+                    },
+                    "500": {
+                        description: "Internal server error",
                     },
                 },
             },
         },
         "/products/{idProduct}": {
             get: {
-                summary: "Obtém um produto pelo ID",
-                tags: ["Products"],
+                summary: "Get product by ID",
                 parameters: [
                     {
                         name: "idProduct",
@@ -61,46 +99,14 @@ export const openApiSpec: OpenAPIV3.Document = {
                     },
                 ],
                 responses: {
-                    200: {
-                        description: "Produto encontrado",
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    $ref: "#/components/schemas/Product",
-                                },
-                            },
-                        },
+                    "200": {
+                        description: "Product found",
                     },
-                    422: {
-                        description: "Erro de validação ou não encontrado",
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    type: "object",
-                                    properties: { message: { type: "string" } },
-                                },
-                            },
-                        },
+                    "404": {
+                        description: "Product not found",
                     },
                 },
             },
         },
     },
-    components: {
-        schemas: {
-            Product: {
-                type: "object",
-                properties: {
-                    id_product: { type: "integer" },
-                    description: { type: "string" },
-                    price: { type: "number" },
-                    width: { type: "integer", nullable: true },
-                    height: { type: "integer", nullable: true },
-                    length: { type: "integer", nullable: true },
-                    weight: { type: "number", nullable: true },
-                },
-                required: ["id_product", "description", "price"],
-            },
-        },
-    },
-}
+};
