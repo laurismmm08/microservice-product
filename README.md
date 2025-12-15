@@ -559,35 +559,100 @@ Analise e descreva como a aplicação implementa os seguintes aspectos de qualid
 
 #### **1. Manutenibilidade**
 - Como a arquitetura facilita manutenção futura?
+   **Resposta**
+
+   A arquitetura adotada facilita significativamente a manutenção futura através da separação clara de responsabilidades entre camadas. Utilizando princípios da Clean Architecture. Por exemplo, para trocar o banco de dados de SQLite para PostgreSQL, apenas a camada de infraestrutura precisa ser ajustada, mantendo intactas as regras de negócio e casos de uso. 
+
 - O código é legível e bem organizado?
+
+   **Resposta**
+
+   Sim, o código é legível e bem organizado. A estrutura segue convenções claras: componentes React são organizados em pastas por funcionalidade (modules/produto), utilitários são centralizados (lib/utils), e componentes reutilizáveis possuem sua própria seção (components/ui). Os nomes são descritivos (ex: Pagination, ProdutoModule, fetchProducts), funções mantêm responsabilidade única.
+
+
 
 #### **2. Testabilidade**
 - Como a arquitetura facilita a criação de testes?
+
+   **Resposta**
+
+   A arquitetura em camadas facilita testes. A domain pode ser testada sem infraestrutura (testes unitários puros), a application com mocks das dependências, e a infra com testes de integração. 
+
 - Os componentes estão desacoplados?
+
+      **Resposta**
+
+      Os componentes estão altamente desacoplados. 
 
 #### **3. Escalabilidade**
 - A arquitetura suporta crescimento da aplicação?
+
+      **Resposta**
+         A arquitetura de microsserviços suporta crescimento vertical (escalar um serviço) e horizontal (adicionar novos serviços). Cada microsserviço (catalog, auth, etc.) é independente, podendo evoluir e escalar separadamente.
+
+
 - É fácil adicionar novas funcionalidades?
+      **Resposta**
+         Sim, é fácil adicionar novas funcionalidades. Para novas features no catalog, basta: criar novo caso de uso na camada application, implementar repositório na infra se necessário, e adicionar endpoint no controller.
 
 #### **4. Reusabilidade**
 - Existem componentes/módulos reutilizáveis?
+
+      **Resposta**
+
+         Sim. O componente Pagination, por exemplo, é totalmente reutilizável em qualquer módulo que necessite de paginação.
+
 - Como o código evita duplicação?
+
+
+      **Resposta**
+         Pode evitar atraves de : Abstração, Composição, Helpers centralizados, Custom Hooks, Design System, Template Method Pattern
+
 
 #### **5. Portabilidade**
 - É fácil trocar tecnologias (banco de dados, servidor HTTP)?
+      **Resposta**
+         Sim, o Repository Pattern abstrai o banco, trocar de SQLite para PostgreSQL envolve apenas criar novo adapter implementando DatabaseConnection. O servidor HTTP (Express) está encapsulado no ExpressAdapter, permitindo trocar por Fastify sem afetar lógica de negócio.
+
 - O código está acoplado a frameworks específicos?
+
+      **Resposta**
+      Mínimo. O backend segue Clean Architecture: regras de negócio (domain) não conhecem Express, TypeORM. O frontend usa React, mas componentes UI são isolados. 
 
 #### **6. Performance**
 - Existem otimizações implementadas?
+      **Resposta**
+
+      Sim, há várias otimizações. A paginação no backend usa LIMIT/OFFSET para buscar apenas os dados necessários, reduzindo carga no banco. No frontend, debounce agrupa ações rápidas e AbortController cancela requisições antigas. Cache local acelera fallback.
+
 - Como a paginação melhora a performance?
+
+      **Resposta**
+      A paginação melhora drasticamente a performance: em vez de carregar milhares de registros (sobrecarga no BD, rede e memória), carrega apenas uma página (ex: 10 itens). Resulta em resposta mais rápida, menos consumo de rede, memória reduzida e interface responsiva.
 
 #### **7. Segurança**
 - Existem práticas de segurança implementadas?
+
+      **Resposta**
+      Sim, práticas de segurança básicas foram implementadas. 
+
+
 - Como os dados são validados?
+
+      **Resposta**
+      A validação de dados ocorre em ambos os lados: no backend, os parâmetros page e limit são validados para garantir que sejam inteiros positivos dentro de limites seguros (page ≥ 1, 1 ≤ limit ≤ 100), prevenindo ataques como negação de serviço através de consultas massivas. No frontend, inputs são sanitizados e validados antes do envio. A configuração de CORS restringe acesso apenas a origens permitidas, e o uso de TypeScript adiciona uma camada de segurança em tempo de compilação através da tipagem estática. 
 
 #### **8. Documentação**
 - O código está bem documentado?
+
+      **Resposta**
+      Moderada. Código principal tem comentários explicativos, nomes descritivos e tipagem TypeScript que documenta interfaces. Testes servem como documentação do comportamento esperado.
+
+
 - Existe documentação de uso?
+
+      **Resposta**
+      sim
 
 ---
 
